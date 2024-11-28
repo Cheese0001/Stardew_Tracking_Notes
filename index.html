@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notepad with Embedded Google</title>
+  <title>Bot-style Music App</title>
   <style>
-    /* Basic page styling */
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f9;
@@ -14,62 +13,94 @@
       padding: 20px;
     }
 
-    /* Wrapper to hold both notepad and embedded Google */
+    /* Main container to hold everything */
     .container {
       display: flex;
       width: 100%;
       max-width: 1200px;
+      justify-content: space-between;
     }
 
-    /* Styling for the Notepad container */
-    #notepad {
-      width: 50%;
-      padding: 20px;
+    /* Left panel for bot features (music control, etc.) */
+    #musicControl {
+      width: 30%;
       background-color: #fff;
+      padding: 20px;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      margin-right: 20px; /* Space between notepad and Google iframe */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    /* Styling for the iframe container */
-    #googleEmbed {
-      width: 50%;
-      height: 600px; /* Height of the embedded iframe */
-      border: none;
-    }
-
-    /* Styling for the button to open ChatGPT (optional, can be customized) */
-    #openGoogleButton {
+    /* Music player controls */
+    .btn {
       padding: 10px 20px;
       background-color: #4CAF50;
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      margin-top: 10px;
     }
 
-    #openGoogleButton:hover {
+    .btn:hover {
       background-color: #45a049;
     }
-    
+
+    /* Notepad section */
+    #notepad {
+      width: 60%;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #notepad textarea {
+      width: 100%;
+      height: 300px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Main container holding notepad and Google iframe -->
   <div class="container">
+    <!-- Music Control Panel (like a Discord bot) -->
+    <div id="musicControl">
+      <h3>Music Player Control</h3>
+      <button class="btn" onclick="playMusic()">Play Music</button>
+      <button class="btn" onclick="pauseMusic()">Pause Music</button>
+      <button class="btn" onclick="stopMusic()">Stop Music</button>
+    </div>
+
     <!-- Notepad Section -->
     <div id="notepad">
       <h3>Notepad</h3>
-      <textarea id="notes" rows="10" cols="40"></textarea>
+      <textarea id="notes" placeholder="Write your notes here..."></textarea>
     </div>
-
-    <!-- Embedded Google Section -->
-    <iframe id="googleEmbed" src="https://youtube.com"></iframe>
   </div>
 
   <script>
-    // The iframe source is set to Google.com, no additional JS needed
+    // Music controls
+    const audioElement = new Audio('your-audio-file.mp3');  // Replace with your music file
+
+    function playMusic() {
+      audioElement.play();
+    }
+
+    function pauseMusic() {
+      audioElement.pause();
+    }
+
+    function stopMusic() {
+      audioElement.pause();
+      audioElement.currentTime = 0;
+    }
   </script>
 
 </body>
