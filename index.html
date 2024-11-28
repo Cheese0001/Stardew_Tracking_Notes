@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bot-style Music App</title>
+  <title>Music Player - Discord Bot Style</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,27 +13,28 @@
       padding: 20px;
     }
 
-    /* Main container to hold everything */
+    /* Main container */
     .container {
       display: flex;
-      width: 100%;
-      max-width: 1200px;
-      justify-content: space-between;
-    }
-
-    /* Left panel for bot features (music control, etc.) */
-    #musicControl {
-      width: 30%;
-      background-color: #fff;
+      flex-direction: column;
+      width: 60%;
       padding: 20px;
+      background-color: #fff;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
 
-    /* Music player controls */
+    /* Command input box */
+    #commandBox {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    /* Music controls */
     .btn {
       padding: 10px 20px;
       background-color: #4CAF50;
@@ -48,58 +49,87 @@
       background-color: #45a049;
     }
 
-    /* Notepad section */
-    #notepad {
-      width: 60%;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Music player */
+    audio {
+      margin-top: 20px;
+      width: 100%;
+      border-radius: 4px;
     }
 
-    #notepad textarea {
-      width: 100%;
-      height: 300px;
+    /* Chat logs */
+    #chatLog {
+      margin-top: 20px;
       padding: 10px;
-      border: 1px solid #ccc;
+      background-color: #f9f9f9;
       border-radius: 4px;
-      font-size: 14px;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
     }
+
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- Music Control Panel (like a Discord bot) -->
-    <div id="musicControl">
-      <h3>Music Player Control</h3>
-      <button class="btn" onclick="playMusic()">Play Music</button>
-      <button class="btn" onclick="pauseMusic()">Pause Music</button>
-      <button class="btn" onclick="stopMusic()">Stop Music</button>
-    </div>
+    <h2>Music Player - Discord Bot Style</h2>
 
-    <!-- Notepad Section -->
-    <div id="notepad">
-      <h3>Notepad</h3>
-      <textarea id="notes" placeholder="Write your notes here..."></textarea>
-    </div>
+    <!-- Command Input -->
+    <input type="text" id="commandBox" placeholder="Type a command like /play song-name or /play youtube-link..." />
+
+    <!-- Play/Pause Button -->
+    <button class="btn" onclick="handleCommand()">Execute Command</button>
+
+    <!-- Chat log for feedback -->
+    <div id="chatLog"></div>
+
+    <!-- Audio player -->
+    <audio id="audioPlayer" controls style="display:none;">
+      Your browser does not support the audio element.
+    </audio>
   </div>
 
   <script>
-    // Music controls
-    const audioElement = new Audio('your-audio-file.mp3');  // Replace with your music file
+    // Function to handle user commands
+    function handleCommand() {
+      const command = document.getElementById('commandBox').value;
+      const chatLog = document.getElementById('chatLog');
+      const audioPlayer = document.getElementById('audioPlayer');
 
-    function playMusic() {
-      audioElement.play();
+      // Clear input field
+      document.getElementById('commandBox').value = '';
+
+      // Handle play command
+      if (command.startsWith('/play')) {
+        const searchTerm = command.slice(6).trim(); // Get song name or YouTube link after /play
+
+        if (isValidYouTubeLink(searchTerm)) {
+          // If it's a YouTube URL, just play it
+          chatLog.innerHTML += `<p><strong>Bot:</strong> Playing YouTube video: ${searchTerm}</p>`;
+          audioPlayer.src = searchTerm; // Set the audio source to YouTube video
+          audioPlayer.style.display = 'block';
+          audioPlayer.play();
+        } else {
+          // Else, try to search and play song (YouTube search or other music APIs can be integrated)
+          chatLog.innerHTML += `<p><strong>Bot:</strong> Searching for: ${searchTerm} on YouTube...</p>`;
+          // For now, we'll just simulate playing a song by setting a demo song
+          audioPlayer.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; // Replace with actual search URL
+          audioPlayer.style.display = 'block';
+          audioPlayer.play();
+          chatLog.innerHTML += `<p><strong>Bot:</strong> Playing: ${searchTerm}</p>`;
+        }
+      } else {
+        chatLog.innerHTML += `<p><strong>Bot:</strong> Command not recognized. Please type '/play <song-name>' or '/play <youtube-link>'</p>`;
+      }
+
+      // Scroll to the bottom of the chat log
+      chatLog.scrollTop = chatLog.scrollHeight;
     }
 
-    function pauseMusic() {
-      audioElement.pause();
-    }
-
-    function stopMusic() {
-      audioElement.pause();
-      audioElement.currentTime = 0;
+    // Simple check to see if the input is a valid YouTube link (basic regex)
+    function isValidYouTubeLink(str) {
+      const youtubeRegex = /^(https?\:\/\/)?(www\.youtube\.com|youtube\.com)\/(watch\?v=|v\/|e\/|embed\/)([a-zA-Z0-9\-_]{11})$/;
+      return youtubeRegex.test(str);
     }
   </script>
 
