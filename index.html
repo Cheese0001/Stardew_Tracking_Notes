@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resizable YouTube Player</title>
+    <title>Resizable YouTube Player with Search</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,14 +15,27 @@
             background-color: #f0f0f0;
         }
 
+        .wrapper {
+            width: 400px;
+            text-align: center;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
         .container {
             position: relative;
-            width: 400px;
+            width: 100%;
             height: 225px; /* default size for 16:9 aspect ratio */
             background-color: #000;
             overflow: hidden;
             resize: both;
-            overflow: hidden;
             border: 2px solid #333;
             border-radius: 8px;
         }
@@ -46,14 +59,22 @@
 </head>
 <body>
 
-    <div class="container">
-        <iframe id="AIzaSyCX12cF27F_XvdDLMQwhiOfv8cLyKguxrw" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" allowfullscreen></iframe>
-        <div class="resize-handle"></div>
+    <div class="wrapper">
+        <!-- Search Bar -->
+        <input type="text" id="search-input" class="search-bar" placeholder="Search YouTube..." oninput="searchVideo()">
+
+        <!-- Resizable YouTube Player -->
+        <div class="container">
+            <iframe id="youtube-player" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" allowfullscreen></iframe>
+            <div class="resize-handle"></div>
+        </div>
     </div>
 
     <script>
         const resizableContainer = document.querySelector('.container');
         const resizeHandle = document.querySelector('.resize-handle');
+        const youtubePlayer = document.getElementById('youtube-player');
+        const searchInput = document.getElementById('search-input');
 
         let isResizing = false;
 
@@ -71,11 +92,33 @@
             if (isResizing) {
                 const width = e.clientX - resizableContainer.getBoundingClientRect().left;
                 const height = e.clientY - resizableContainer.getBoundingClientRect().top;
-
-                // Set the new width and height with constraints to avoid it becoming too small
                 resizableContainer.style.width = `${Math.max(200, width)}px`;
                 resizableContainer.style.height = `${Math.max(150, height)}px`;
             }
+        }
+
+        // YouTube API Key (you need to replace this with your own API key)
+        const API_KEY = 'AIzaSyCX12cF27F_XvdDLMQwhiOfv8cLyKguxrw';
+
+        // Function to search and update the YouTube player with the selected video
+        function searchVideo() {
+            const query = searchInput.value.trim();
+            if (query.length > 0) {
+                fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&key=${API_KEY}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.items && data.items.length > 0) {
+                            const videoId = data.items[0].id.videoId;
+                            updateVideo(videoId);
+                        }
+                    })
+                    .catch(error => console.error('Error fetching YouTube data:', error));
+            }
+        }
+
+        // Function to update the iframe with the new video ID
+        function updateVideo(videoId) {
+            youtubePlayer.src = `https://www.youtube.com/embed/${videoId}`;
         }
     </script>
 
