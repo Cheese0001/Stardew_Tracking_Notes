@@ -3,172 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notepad with ChatGPT</title>
+    <title>Notepad with ChatGPT Integration</title>
     <style>
-        /* Basic Styles */
+        /* Add your CSS here for styling the notepad and chat widget */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
         }
 
-        /* Notepad container */
-        #notepad-container {
-            width: 80%;
-            max-width: 800px;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        /* ChatGPT container */
-        #chatgpt-container {
-            width: 80%;
-            max-width: 800px;
-            background-color: #fff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 10px;
-            margin-top: 20px;
-            border-radius: 8px;
-        }
-
-        .chat-area {
-            border: 1px solid #ccc;
-            height: 200px;
-            overflow-y: scroll;
-            margin-bottom: 10px;
-            padding: 10px;
-            font-size: 16px;
-        }
-
-        .chat-input {
+        .notepad {
             width: 100%;
+            height: 200px;
             padding: 10px;
-            font-size: 16px;
-            border-radius: 8px;
+            background-color: #fff;
             border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            resize: both;
+            overflow: auto;
         }
 
-        #sendMessageButton {
-            background-color: #dfb7cc;
-            color: white;
+        .chat-container {
+            width: 100%;
+            height: 300px;
             padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        #sendMessageButton:hover {
-            background-color: #c6b0c8;
-        }
-
-        /* For Notepad's text size */
-        #textSizeButtons {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-top: 10px;
         }
 
-        .size-button {
-            padding: 5px 10px;
-            margin: 5px;
-            background-color: #93b9cf;
+        .chat-output {
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+
+        .input-container {
+            margin-top: 10px;
+        }
+
+        .input-container input {
+            width: 80%;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .input-container button {
+            padding: 10px;
+            font-size: 14px;
+            background-color: #4CAF50;
             color: white;
-            border-radius: 5px;
+            border: none;
             cursor: pointer;
         }
 
-        .size-button:hover {
-            background-color: #9da8c4;
+        .input-container button:hover {
+            background-color: #45a049;
         }
+
+        /* Additional styling for light/dark theme and responsiveness */
     </style>
 </head>
 <body>
+    <div class="notepad" id="notepad" contenteditable="true">
+        Type your notes here...
+    </div>
 
-    <!-- Notepad Section -->
-    <div id="notepad-container">
-        <h2>My Notepad</h2>
-        <textarea id="notepad" rows="10" style="width: 100%;" placeholder="Write something here..."></textarea>
-
-        <!-- Text Size Buttons -->
-        <div id="textSizeButtons">
-            <button class="size-button" id="increaseSize">Increase Text Size</button>
-            <button class="size-button" id="decreaseSize">Decrease Text Size</button>
+    <div class="chat-container">
+        <div class="chat-output" id="chat-output">
+            ChatGPT will respond here...
+        </div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Ask ChatGPT...">
+            <button onclick="sendMessage()">Send</button>
         </div>
     </div>
 
-    <!-- ChatGPT Section -->
-    <div id="chatgpt-container">
-        <h3>Chat with ChatGPT</h3>
-        <div id="chatArea" class="chat-area"></div>
-        <textarea id="userMessage" placeholder="Type a message..." class="chat-input"></textarea>
-        <button id="sendMessageButton">Send</button>
-    </div>
-
     <script>
-        // Notepad Text Size Logic
-        let textArea = document.getElementById("notepad");
-        let increaseSizeButton = document.getElementById("increaseSize");
-        let decreaseSizeButton = document.getElementById("decreaseSize");
+        // Your OpenAI API key (make sure to replace this with your actual API key)
+        const apiKey = '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
+'; // Replace with your actual API key
 
-        let currentFontSize = 16; // Starting font size
-        increaseSizeButton.addEventListener("click", () => {
-            currentFontSize += 2;
-            textArea.style.fontSize = currentFontSize + "px";
-        });
-        decreaseSizeButton.addEventListener("click", () => {
-            currentFontSize -= 2;
-            textArea.style.fontSize = currentFontSize + "px";
-        });
+        // Function to send a message to ChatGPT
+        async function sendMessage() {
+            const userMessage = document.getElementById('user-input').value;
+            if (!userMessage) return;
 
-        // ChatGPT Interaction Logic
-        const sendMessageButton = document.getElementById('sendMessageButton');
-        const userMessage = document.getElementById('userMessage');
-        const chatArea = document.getElementById('chatArea');
+            // Display user message in chat
+            const chatOutput = document.getElementById('chat-output');
+            chatOutput.innerHTML += `<div>User: ${userMessage}</div>`;
 
-        const openaiApiKey = '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
-'; // Replace with your actual OpenAI API key
-
-        sendMessageButton.addEventListener('click', async () => {
-            const message = userMessage.value;
-            if (!message.trim()) return;  // Don't send empty messages
-
-            // Show the user's message in the chat
-            chatArea.innerHTML += `<div>User: ${message}</div>`;
-            userMessage.value = '';  // Clear input box
+            // Clear the input field
+            document.getElementById('user-input').value = '';
 
             try {
-                // Send message to OpenAI API
+                // Call the OpenAI API to get a response
                 const response = await fetch('https://api.openai.com/v1/completions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${openaiApiKey}`
+                        'Authorization': `Bearer ${apiKey}`,
                     },
                     body: JSON.stringify({
-                        model: 'gpt-3.5-turbo',  // You can switch to gpt-4 if you have access
-                        messages: [{ role: 'user', content: message }],
-                    })
+                        model: 'text-davinci-003',  // You can use other models like 'gpt-3.5-turbo' if available
+                        prompt: userMessage,
+                        max_tokens: 150,
+                    }),
                 });
 
                 const data = await response.json();
-                const gptMessage = data.choices[0].message.content;
 
-                // Show ChatGPT's response
-                chatArea.innerHTML += `<div>ChatGPT: ${gptMessage}</div>`;
-
-                // Scroll to the latest message
-                chatArea.scrollTop = chatArea.scrollHeight;
+                // Check if the response was successful
+                if (response.ok) {
+                    // Display ChatGPT's response in the chat
+                    chatOutput.innerHTML += `<div>ChatGPT: ${data.choices[0].text.trim()}</div>`;
+                } else {
+                    // If an error occurs, display the error message
+                    chatOutput.innerHTML += `<div style="color: red;">Error: ${data.error.message}</div>`;
+                }
             } catch (error) {
-                console.error('Error:', error);
-                chatArea.innerHTML += `<div>ChatGPT: Sorry, something went wrong.</div>`;
+                // Handle network or other errors
+                console.error('Error with the API request:', error);
+                const chatOutput = document.getElementById('chat-output');
+                chatOutput.innerHTML += `<div style="color: red;">Something went wrong. Please try again later.</div>`;
             }
-        });
+        }
     </script>
-
 </body>
 </html>
